@@ -5,7 +5,7 @@ import hashlib
 # URL of your JSON file in the repo
 REPO_JSON_URL = "https://raw.githubusercontent.com/santhoshriha/daily_gk/main/data/questions.json"
 # URL of my daily questions (replace with your Gist/API)
-DAILY_JSON_URL = "https://gist.githubusercontent.com/{username}/{gist-id}/raw/daily_questions.json"
+DAILY_JSON_URL = "https://raw.githubusercontent.com/santhoshriha/daily_gk/refs/heads/main/data/questions.json"
 
 def update_questions():
     # Fetch existing questions from your repo
