@@ -2,30 +2,41 @@ import json
 import requests
 import hashlib
 
-# URL of your JSON file in the repo
 REPO_JSON_URL = "https://raw.githubusercontent.com/santhoshriha/daily_gk/main/data/questions.json"
-# URL of my daily questions (replace with your Gist/API)
-DAILY_JSON_URL = "https://raw.githubusercontent.com/santhoshriha/daily_gk/refs/heads/main/data/questions.json"
+DAILY_JSON_URL = "https://gist.githubusercontent.com/{username}/{gist-id}/raw/daily_questions.json"  # REPLACE THIS
 
 def update_questions():
-    # Fetch existing questions from your repo
-    response = requests.get(REPO_JSON_URL)
-    existing_data = response.json()
-    existing_hashes = {q["id"] for q in existing_data["questions"]}
+    try:
+        # Fetch existing questions
+        repo_response = requests.get(REPO_JSON_URL)
+        repo_response.raise_for_status()
+        existing_data = repo_response.json()
+        existing_questions = {q["question"] for q in existing_data["questions"]}  # Avoid duplicates by question text
 
-    # Fetch new daily questions
-    new_questions = requests.get(DAILY_JSON_URL).json()
+        # Fetch new questions
+        daily_response = requests.get(DAILY_JSON_URL)
+        daily_response.raise_for_status()
+        new_questions = daily_response.json()
 
-    # Generate unique ID using question text hash
-    for q in new_questions:
-        q_hash = hashlib.md5(q["question"].encode()).hexdigest()
-        if q_hash not in existing_hashes:
-            q["id"] = q_hash
-            existing_data["questions"].append(q)
+        # Generate numeric IDs (assuming existing IDs are integers)
+        last_id = max(q["id"] for q in existing_data["questions"]) if existing_data["questions"] else 0
+        new_entries = []
+        for q in new_questions:
+            if q["question"] not in existing_questions:
+                last_id += 1
+                q["id"] = last_id
+                new_entries.append(q)
 
-    # Save updated JSON locally (GitHub Actions will commit this)
-    with open("data/questions.json", "w", encoding="utf-8") as f:
-        json.dump(existing_data, f, ensure_ascii=False, indent=2)
+        # Append new entries
+        existing_data["questions"].extend(new_entries)
+
+        # Save updated JSON
+        with open("data/questions.json", "w", encoding="utf-8") as f:
+            json.dump(existing_data, f, ensure_ascii=False, indent=2)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
 
 if __name__ == "__main__":
     update_questions()
