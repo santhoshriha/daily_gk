@@ -3,7 +3,7 @@ import requests
 import hashlib
 
 REPO_JSON_URL = "https://raw.githubusercontent.com/santhoshriha/daily_gk/main/data/questions.json"
-DAILY_JSON_URL = "https://gist.githubusercontent.com/santhoshriha/f7bafc57b24f0923b359b5c305c08f0a/raw/questions.json"  # REPLACE THIS
+DAILY_JSON_URL = "https://gist.githubusercontent.com/santhoshriha/2d042e91048e3657bc5c7bd9abc4d5e3/raw/questions.json"  # REPLACE THIS
 
 
 def update_questions():
